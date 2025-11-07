@@ -6,6 +6,7 @@ metadata:
     prometheus: prometheus-operator
     role: alert-rules
     release: prometheus-operator
+    {{ include "laa-fee-scheme-api.labels" . | nindent 4 }}
   name: prometheus-custom-rules-{{ .Chart.Name }}
 spec:
   groups:
@@ -39,7 +40,7 @@ spec:
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodcrashlooping
         dashboard_url: {{ .Values.prometheus.dashboardUrl }}
       expr: rate(kube_pod_container_status_restarts_total{job="kube-state-metrics", namespace="{{ .Release.Namespace }}"}[15m]) * 60 * 5 > 0
-      for: 1h
+      for: 15m
       labels:
         severity: {{ .Values.prometheus.severity }}
     - alert: KubePodNotReady
@@ -48,7 +49,7 @@ spec:
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodnotready
         dashboard_url: {{ .Values.prometheus.dashboardUrl }}
       expr: sum by (namespace, pod) (kube_pod_status_phase{job="kube-state-metrics",namespace="{{ .Release.Namespace }}",phase=~"Pending|Unknown"}) > 0
-      for: 1h
+      for: 15m
       labels:
         severity: {{ .Values.prometheus.severity }}
     - alert: KubeDeploymentGenerationMismatch
@@ -67,6 +68,6 @@ spec:
         runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubedeploymentreplicasmismatch
         dashboard_url: {{ .Values.prometheus.dashboardUrl }}
       expr: (kube_deployment_spec_replicas{job="kube-state-metrics", namespace="{{ .Release.Namespace }}"} != kube_deployment_status_replicas_available{job="kube-state-metrics", namespace="{{ .Release.Namespace }}"})
-      for: 1h
+      for: 15m
       labels:
         severity: {{ .Values.prometheus.severity }}
